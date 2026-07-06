@@ -1,0 +1,32 @@
+@startuml use-case
+' Board Analytics - Use Case Diagram
+' COMP 354 - Team 65711
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "Project Member" as Member
+actor "Project Manager" as Manager
+actor "Kanboard\n(Authentication\n& Authorization)" as System
+
+Manager --|> Member
+
+rectangle "Kanboard : Board Analytics Plugin" {
+  usecase "View Board Analytics\nDashboard" as UC1
+  usecase "See tasks per column" as UC2
+  usecase "See tasks per assignee" as UC3
+  usecase "See tasks completed\nover last N weeks" as UC4
+  usecase "Choose reporting\nwindow (weeks)" as UC5
+  usecase "Authenticate &\ncheck project access" as UC6
+}
+
+Member --> UC1
+UC1 ..> UC2 : <<include>>
+UC1 ..> UC3 : <<include>>
+UC1 ..> UC4 : <<include>>
+UC1 ..> UC6 : <<include>>
+UC5 ..> UC1 : <<extend>>
+Manager --> UC5
+
+UC6 --> System
+@enduml

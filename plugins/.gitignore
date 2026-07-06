@@ -1,2 +1,6 @@
 *
 !/.gitignore
+
+# COMP 354 - Team 65711: keep our Board Analytics plugin under version control
+!/BoardAnalytics
+!/BoardAnalytics/**

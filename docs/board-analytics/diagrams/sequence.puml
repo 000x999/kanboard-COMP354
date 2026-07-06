@@ -1,0 +1,47 @@
+@startuml sequence
+' Board Analytics - Sequence Diagram: viewing the dashboard
+' COMP 354 - Team 65711
+autonumber
+actor User
+participant "Router" as R
+participant "BoardAnalyticsController" as C
+participant "BaseController" as B
+participant "TaskDistributionAnalytic" as TDA
+participant "BoardAnalyticsModel" as M
+participant "TaskFinderModel" as TF
+participant "ProjectUserRoleModel" as PUR
+database "Database" as DB
+participant "Template + View" as V
+
+User -> R : GET /board-analytics/1?weeks=8
+R -> C : show()
+C -> B : getProject()
+B -> DB : SELECT project + check membership
+DB --> B : project row
+alt not a member / not found
+    B --> User : 403 / redirect
+end
+B --> C : project
+
+C -> TDA : build(project_id)
+TDA -> DB : COUNT tasks per column
+DB --> TDA : rows
+TDA --> C : task-distribution metrics (donut)
+
+C -> M : build(project_id, weeks)
+
+M -> TF : getAll(project_id)
+TF -> DB : SELECT active tasks
+DB --> TF : tasks
+TF --> M : tasks
+M -> PUR : getAssignableUsersList(project_id)
+PUR --> M : [user_id => name]
+
+M -> DB : SELECT date_completed WHERE closed AND >= window_start
+DB --> M : completed rows
+note right of M : bucket completions\ninto weeks (PHP)
+
+M --> C : { per_assignee, per_week }
+C -> V : render dashboard/show
+V --> User : HTML dashboard (donut + bars + tables)
+@enduml

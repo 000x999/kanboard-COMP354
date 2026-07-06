@@ -1,0 +1,75 @@
+@startuml class
+' Board Analytics - Class Diagram
+' COMP 354 - Team 65711
+skinparam classAttributeIconSize 0
+
+package "Kanboard\\Core\\Plugin" {
+  abstract class Base {
+    +initialize()
+    +on(event, callback)
+    +getClasses() : array
+  }
+}
+
+package "Kanboard\\Core" {
+  abstract class CoreBase as "Base" {
+    #container
+    +__get(name)
+  }
+}
+
+package "Kanboard\\Controller" {
+  class BaseController {
+    #getProject() : array
+    #response
+    #request
+    #helper
+  }
+}
+
+package "Kanboard\\Plugin\\BoardAnalytics" {
+  class Plugin {
+    +initialize()
+    +getPluginName() : string
+    +getPluginVersion() : string
+    +getCompatibleVersion() : string
+  }
+
+  class BoardAnalyticsController {
+    +show() : void
+  }
+
+  class BoardAnalyticsModel {
+    +getTasksPerAssignee(project_id) : array
+    +getTasksCompletedPerWeek(project_id, weeks) : array
+    +build(project_id, weeks) : array
+  }
+}
+
+package "Kanboard\\Analytic" {
+  class TaskDistributionAnalytic {
+    +build(project_id) : array
+  }
+}
+
+package "Kanboard\\Model" {
+  class TaskFinderModel {
+    +getAll(project_id)
+  }
+  class ProjectUserRoleModel {
+    +getAssignableUsersList(project_id)
+  }
+}
+
+Base --|> CoreBase
+Plugin --|> Base
+BaseController --|> CoreBase
+BoardAnalyticsController --|> BaseController
+BoardAnalyticsModel --|> CoreBase
+
+BoardAnalyticsController ..> BoardAnalyticsModel : creates & calls build()
+BoardAnalyticsController ..> TaskDistributionAnalytic : reuses build() for donut
+BoardAnalyticsModel ..> TaskFinderModel : uses
+BoardAnalyticsModel ..> ProjectUserRoleModel : uses
+Plugin ..> BoardAnalyticsController : registers route to
+@enduml

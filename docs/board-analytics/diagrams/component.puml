@@ -1,0 +1,47 @@
+@startuml component
+' Board Analytics - System / Component Architecture
+' COMP 354 - Team 65711
+skinparam componentStyle rectangle
+
+actor "Browser" as Browser
+
+package "Kanboard Core (unmodified)" {
+  [Router] as Router
+  [Runner /\nMiddleware] as Runner
+  [BaseController] as Base
+  [Template Engine\n+ Hook system] as Tpl
+  [TaskDistributionAnalytic\n+ c3.js donut] as TDA
+  [TaskFinderModel] as TaskM
+  [ProjectUserRoleModel] as PurM
+  database "SQLite / MySQL / PostgreSQL\n(tasks, columns, users)" as DB
+  [Plugin Loader] as Loader
+}
+
+package "plugins/BoardAnalytics (our code)" {
+  [Plugin.php\n(registration)] as Plugin
+  [BoardAnalyticsController] as Ctrl
+  [BoardAnalyticsModel] as Model
+  [Template\n(dashboard/show.php)] as View
+  [board-analytics.css] as CSS
+}
+
+Browser --> Router : GET /board-analytics/:id
+Router --> Runner
+Runner --> Ctrl : dispatch show()
+Ctrl --|> Base
+Ctrl --> TDA : build() -> donut (task distribution)
+Ctrl --> Model : build(project_id, weeks)
+Model --> TaskM : getAll()
+Model --> PurM : getAssignableUsersList()
+Model --> DB : completed-per-week query
+TDA --> DB
+TaskM --> DB
+Ctrl --> Tpl : render dashboard/show
+Tpl --> View
+View ..> CSS : styled by
+Tpl --> Browser : HTML
+
+Loader ..> Plugin : scan() + initialize()
+Plugin ..> Router : addRoute()
+Plugin ..> Tpl : override sidebar + hooks (dropdown, css)
+@enduml
