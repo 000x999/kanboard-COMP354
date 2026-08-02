@@ -66,10 +66,10 @@ class BoardAnalyticsModel extends Base
      * no completed task are returned as zero so the series is continuous.
      *
      * @param  integer $project_id
-     * @param  integer $weeks       How many trailing weeks to report (default 8)
+     * @param  integer $weeks       How many trailing weeks to report (default 10)
      * @return array   List of ['week' => 'YYYY-MM-DD', 'label' => string, 'nb_tasks' => int]
      */
-    public function getTasksCompletedPerWeek($project_id, $weeks = 8)
+    public function getTasksCompletedPerWeek($project_id, $weeks = 10)
     {
         // Start of the current week (Monday, 00:00:00 local time).
         $current_monday = strtotime('monday this week');
@@ -129,7 +129,7 @@ class BoardAnalyticsModel extends Base
      * @param  integer $weeks
      * @return array
      */
-    public function build($project_id, $weeks = 8)
+    public function build($project_id, $weeks = 10)
     {
         return array(
             'tasks_per_assignee' => $this->getTasksPerAssignee($project_id),

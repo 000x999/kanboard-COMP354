@@ -53,7 +53,7 @@ Add `?weeks=N` (4–26) to change the throughput window.
 
 - New metric → add a method to `BoardAnalyticsModel`, expose it from `build()`, and add a
   `.ba-section` in `dashboard/show.php`.
-- Change the default window → the `$weeks = 8` default in the controller and model.
+- Change the default window → the `$weeks = 10` default in the controller and model.
 
 ## License
 

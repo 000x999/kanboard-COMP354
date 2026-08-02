@@ -25,8 +25,8 @@ class BoardAnalyticsController extends BaseController
         $project = $this->getProject();
         $model = new BoardAnalyticsModel($this->container);
 
-        // Allow ?weeks=N (clamped to a sane range); default to 8 weeks.
-        $weeks = (int) $this->request->getIntegerParam('weeks', 8);
+        // Allow ?weeks=N (clamped to a sane range); default to 10 weeks.
+        $weeks = (int) $this->request->getIntegerParam('weeks', 10);
         $weeks = max(4, min(26, $weeks));
 
         $metrics = $model->build($project['id'], $weeks);
