@@ -8,7 +8,7 @@ use Kanboard\Model\TaskModel;
 /**
  * Board Analytics Model
  *
- * Computes the three metrics shown on the dashboard for a single project.
+ * Computes the four metrics shown on the dashboard for a single project.
  * All numbers are derived from Kanboard's own "tasks" and "columns" tables,
  * so the plugin stays in sync with the board automatically and needs no
  * schema of its own.
@@ -56,6 +56,46 @@ class BoardAnalyticsModel extends Base
         }
 
         return $result;
+    }
+
+    // Group active tasks by due-date status.
+    public function getDueDateStatus($project_id)
+    {
+        $tasks = $this->taskFinderModel->getAll($project_id);
+        $now = time();
+        $soon = $now + (7 * 86400);
+        $buckets = array(
+            'overdue' => array('label' => 'Overdue', 'nb_tasks' => 0),
+            'due_soon' => array('label' => 'Due within 7 days', 'nb_tasks' => 0),
+            'due_later' => array('label' => 'Due later', 'nb_tasks' => 0),
+            'no_due_date' => array('label' => 'No due date', 'nb_tasks' => 0),
+        );
+
+        foreach ($tasks as $task) {
+            $date_due = (int) $task['date_due'];
+
+            if ($date_due === 0) {
+                $bucket = 'no_due_date';
+            } elseif ($date_due <= $now) {
+                $bucket = 'overdue';
+            } elseif ($date_due <= $soon) {
+                $bucket = 'due_soon';
+            } else {
+                $bucket = 'due_later';
+            }
+
+            $buckets[$bucket]['nb_tasks']++;
+        }
+
+        $total = count($tasks);
+
+        foreach ($buckets as &$bucket) {
+            $bucket['percentage'] = $total > 0 ? round(($bucket['nb_tasks'] * 100) / $total, 1) : 0.0;
+        }
+
+        unset($bucket);
+
+        return array_values($buckets);
     }
 
     /**
@@ -134,6 +174,7 @@ class BoardAnalyticsModel extends Base
         return array(
             'tasks_per_assignee' => $this->getTasksPerAssignee($project_id),
             'completed_per_week' => $this->getTasksCompletedPerWeek($project_id, $weeks),
+            'due_date_status'      => $this->getDueDateStatus($project_id),
         );
     }
 }
