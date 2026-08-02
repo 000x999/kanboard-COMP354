@@ -118,4 +118,35 @@
         <?php endif ?>
     </div>
 
+    <!-- 4. Active-task due-date health -->
+    <div class="ba-section">
+        <h3><?= t('Active-task due-date health') ?></h3>
+
+        <div class="ba-chart">
+            <?php foreach ($due_date_status as $row): ?>
+                <div class="ba-bar-row">
+                    <div class="ba-bar-label"><?= t($row['label']) ?></div>
+                    <div class="ba-bar-track">
+                        <div class="ba-bar-fill ba-bar-assignee" style="width: <?= $row['percentage'] ?>%;"></div>
+                    </div>
+                    <div class="ba-bar-value"><?= (int) $row['nb_tasks'] ?></div>
+                </div>
+            <?php endforeach ?>
+        </div>
+
+        <table class="table-striped">
+            <tr>
+                <th><?= t('Due-date status') ?></th>
+                <th><?= t('Number of tasks') ?></th>
+                <th><?= t('Percentage') ?></th>
+            </tr>
+            <?php foreach ($due_date_status as $row): ?>
+                <tr>
+                    <td><?= t($row['label']) ?></td>
+                    <td><?= (int) $row['nb_tasks'] ?></td>
+                    <td><?= n($row['percentage']) ?>%</td>
+                </tr>
+            <?php endforeach ?>
+        </table>
+    </div>
 </div>

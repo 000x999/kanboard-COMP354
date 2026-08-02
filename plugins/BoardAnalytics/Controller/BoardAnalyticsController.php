@@ -38,6 +38,7 @@ class BoardAnalyticsController extends BaseController
             'task_distribution'  => $this->taskDistributionAnalytic->build($project['id']),
             'tasks_per_assignee' => $metrics['tasks_per_assignee'],
             'completed_per_week' => $metrics['completed_per_week'],
+            'due_date_status'    => $metrics['due_date_status'],
             'title'              => t('Board Analytics'),
         )));
     }
